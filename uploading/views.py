@@ -344,55 +344,58 @@ def fetch(request):
     username = None
     usernamed = request.user.username 
     dfs = pd.DataFrame(sch_reg.objects.all().values().filter(username = usernamed ))
-    ff = list(dfs['school'])
-    sch = ff[0]
-    df = pd.DataFrame(fees_update.objects.all().values().filter(school = sch))
-    skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
-    com = ['classA', 'classB', 'classC', 'classD', 'classE', 'classF', 'classG', 'classH','classI','classJ', 'classK', 'classL', 'classM', 'classN', 'classO']
-    skuul = skuul[com]
-    ree = list(skuul.iloc[0])
-    ree = [x for x in ree if x != '0']
-    ree = [x for x in ree if x != None]
+    if usernamed in list(dfs['username']):
+        ff = list(dfs['school'])
+        sch = ff[0]
+        df = pd.DataFrame(fees_update.objects.all().values().filter(school = sch))
+        skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
+        com = ['classA', 'classB', 'classC', 'classD', 'classE', 'classF', 'classG', 'classH','classI','classJ', 'classK', 'classL', 'classM', 'classN', 'classO']
+        skuul = skuul[com]
+        ree = list(skuul.iloc[0])
+        ree = [x for x in ree if x != '0']
+        ree = [x for x in ree if x != None]
 
-    #ree = ['Creche','K.G1', 'K.G2', 'Class1', 'Class2', 'Class3', 'Class4', 'Class5', 'Class6', 'J.H.S1', 'J.H.S2', 'J.H.S3']
-    #ree = ['Creche', 'K.G1']
-    for z in ree:
-        dft = pd.DataFrame(fees_update.objects.all().values().filter(school = sch).filter(level = z).filter(promote = 1))
-        if list(dft) == []:
-            move = 1
-        else:
-            filt = list(dft['stu_id'])
-            prom_id = list(dft['stu_id'])
-            position = ree.index(z)
-            pos1 = ree[position]
-            if pos1 == ree[-1]:
-                #pos2 = ree[0]
-                pos2 = 'graduate'
+        #ree = ['Creche','K.G1', 'K.G2', 'Class1', 'Class2', 'Class3', 'Class4', 'Class5', 'Class6', 'J.H.S1', 'J.H.S2', 'J.H.S3']
+        #ree = ['Creche', 'K.G1']
+        for z in ree:
+            dft = pd.DataFrame(fees_update.objects.all().values().filter(school = sch).filter(level = z).filter(promote = 1))
+            if list(dft) == []:
+                move = 1
             else:
-                pos2 = ree[position+1]
-            prom_id = [(x.replace(z ,pos2)) for x in prom_id]
-            dft['stu_id'] = prom_id
-            dft['level'] = pos2
-            dft['promote'] = 0
-            dft.dropna()
-            schz = list(dft['school_full'])
-            first = list(dft['firstname'])
-            middle = list(dft['middlename'])
-            last = list(dft['lastname'])
-            skuul = list(dft['school'])
-            levv = list(dft['level'])
-            ppp = list(dft['promote'])
-            
-            for a,b,c,d,e,f,g,h,j in zip(schz,first,middle,last, prom_id, filt, skuul, levv, ppp):##       
-               # fees_update.objects.filter(stu_id=f).update(school = g, school_full = a , stu_id = e, firstname = c, middlename = c, lastname = d, level = h, promote = j)
-                new_entry = fees_update(school = g, school_full = a , stu_id = e, firstname = b, middlename = c, lastname = d, level = h, promote = j)
-                new_entry.save()
-    fees_update.objects.filter(school = sch).filter(promote = 1).delete()
-    dfb = pd.DataFrame(fees_update.objects.all().values().filter(school = sch))
-    stu_ring = list(dfb['stu_id'])
-    dfb['promote'] = 1
-    pr_ring = list(dfb['promote'])
-    for a,b in zip(stu_ring, pr_ring):
-        fees_update.objects.filter(school = sch).filter(stu_id = a).update(promote = b)
-    return render(request, 'fetch.html')
+                filt = list(dft['stu_id'])
+                prom_id = list(dft['stu_id'])
+                position = ree.index(z)
+                pos1 = ree[position]
+                if pos1 == ree[-1]:
+                    #pos2 = ree[0]
+                    pos2 = 'graduate'
+                else:
+                    pos2 = ree[position+1]
+                prom_id = [(x.replace(z ,pos2)) for x in prom_id]
+                dft['stu_id'] = prom_id
+                dft['level'] = pos2
+                dft['promote'] = 0
+                dft.dropna()
+                schz = list(dft['school_full'])
+                first = list(dft['firstname'])
+                middle = list(dft['middlename'])
+                last = list(dft['lastname'])
+                skuul = list(dft['school'])
+                levv = list(dft['level'])
+                ppp = list(dft['promote'])
+                
+                for a,b,c,d,e,f,g,h,j in zip(schz,first,middle,last, prom_id, filt, skuul, levv, ppp):##       
+                # fees_update.objects.filter(stu_id=f).update(school = g, school_full = a , stu_id = e, firstname = c, middlename = c, lastname = d, level = h, promote = j)
+                    new_entry = fees_update(school = g, school_full = a , stu_id = e, firstname = b, middlename = c, lastname = d, level = h, promote = j)
+                    new_entry.save()
+        fees_update.objects.filter(school = sch).filter(promote = 1).delete()
+        dfb = pd.DataFrame(fees_update.objects.all().values().filter(school = sch))
+        stu_ring = list(dfb['stu_id'])
+        dfb['promote'] = 1
+        pr_ring = list(dfb['promote'])
+        for a,b in zip(stu_ring, pr_ring):
+            fees_update.objects.filter(school = sch).filter(stu_id = a).update(promote = b)
+        return render(request, 'fetch.html')
+    else:
+        return render(request, 'unauth.html')
 #['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount','amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3','fee', 'balance', 'school', 'datey']
