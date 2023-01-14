@@ -87,8 +87,11 @@ def index(request):
             code = list(dfs['school'])
             code = code[0]
             df_act = pd.DataFrame(act.objects.all().values().filter(school = code))
-            term = list(df_act['active_term']) 
-            term = term[0]
+            if list(df_act) == []:
+                term = ''
+            else:
+                term = list(df_act['active_term']) 
+                term = term[0]
             return render(request, 'upload.html', {'full_sch': full_sch, 'term': term})
         else:
             excel_file = request.FILES["excel_file"]
