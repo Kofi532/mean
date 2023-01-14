@@ -287,6 +287,8 @@ def report_reg(request):
     ff = list(dfs['school'])
     sch = ff[0]
     skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
+    if list(skuul) == []:
+        return render(request, 'registerclass.html', {})
     com = ['classA', 'classB', 'classC', 'classD', 'classE', 'classF', 'classG', 'classH','classI','classJ', 'classK', 'classL', 'classM', 'classN', 'classO']
     skuul = skuul[com]
     ree = list(skuul.iloc[0])

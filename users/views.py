@@ -576,7 +576,7 @@ def download3(request):
         workbook.close()
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename= date.today()+'xlsx')
+        return FileResponse(buffer, as_attachment=True, filename= str(date.today())+'.xlsx')
 
 def sem(request):
         username = None
@@ -649,6 +649,8 @@ def fees(request):
             skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
             com = ['classA', 'classB', 'classC', 'classD', 'classE', 'classF', 'classG', 'classH','classI','classJ', 'classK', 'classL', 'classM', 'classN', 'classO']
             skuul = skuul[com]
+            if list(skuul) == []:
+                return render(request, 'registerclass.html', {})
             ree = list(skuul.iloc[0])
             ree = [x for x in ree if x != '0']
             ree = [x for x in ree if x != None]      
