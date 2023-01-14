@@ -576,7 +576,7 @@ def download3(request):
         workbook.close()
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename='upload.xlsx')
+        return FileResponse(buffer, as_attachment=True, filename= date.today()+'xlsx')
 
 def sem(request):
         username = None
