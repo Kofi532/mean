@@ -14,7 +14,7 @@ from itertools import islice
 from operator import add
 import numpy as np
 from django.contrib.auth.decorators import login_required
-
+from scipy.stats import rankdata
 # Create your views here.
 
 #['stu_id', 'subjectA', 'subjectB', 'subjectC', 'subjectD', 'subjectE', 'subjectF', 'subjectG', 'subjectH','subjectI','subjectJ', 'subjectK', 'subjectL',]
@@ -390,8 +390,8 @@ def report_cards(request):
                 for q in students:
                     worksheet = workbook.add_worksheet(q)
                     worksheet.protect()
-                    worksheet.merge_range('A1:E1', schr, merge_format)
-                    worksheet.merge_range('A2:E2', 'Tel: '+tel , merge_format)
+                    worksheet.merge_range('A1:D1', schr, merge_format)
+                    worksheet.merge_range('A2:D2', 'Tel: '+tel , merge_format)
                     columns1 = ['Stu_id' , 'Firstname' , 'Middlename', 'Lastname', 'Level']
                     alp = list(string.ascii_uppercase[2:len(columns1)])
                     df = pd.DataFrame(fees_update.objects.all().values().filter(school=sch).filter(level = i).filter(stu_id = q))
@@ -403,7 +403,7 @@ def report_cards(request):
                         df_list = list(df_in.iloc[0])
                         row_num = 4
                         for col_num in range(len(df_list)): ##add real name
-                            worksheet.write(row_num, col_num, df_list[col_num])
+                            worksheet.write(row_num, col_num, df_list[col_num], merge_format1)
                     row_num = 3
                     for col_num in range(len(columns1)):
                         worksheet.write(row_num, col_num, columns1[col_num], merge_format)  #adding name thems columns
@@ -436,7 +436,7 @@ def report_cards(request):
                     lists30 = lists30[0:length-1]
                     for row_num in range(len(lists30)): ##30% marks
                         col_num = 1
-                        worksheet.write(row_num+7, col_num, lists30[row_num]) 
+                        worksheet.write(row_num+7, col_num, lists30[row_num], merge_format1) 
                     df70 = pd.DataFrame(report70.objects.all().values().filter(school=sch).filter(level = i).filter(stu_id=q)) 
                     df70 = df70[cols]
                     lists70 = list(df70.iloc[0])
@@ -446,9 +446,10 @@ def report_cards(request):
                     lists70 = lists70[0:length-1]
                     for row_num in range(len(lists70)): ##70% marks
                         col_num = 2
-                        worksheet.write(row_num+7, col_num, lists70[row_num]) 
+                        worksheet.write(row_num+7, col_num, lists70[row_num], merge_format1) 
                     df100 = pd.DataFrame(report.objects.all().values().filter(school=sch).filter(level = i).filter(stu_id=q)) 
                     df100 = df100[cols]
+                    dff100 = df100.copy()
                     lists100 = list(df100.iloc[0])
                 #   lists30= list(dict.fromkeys(lists30))
                 #   lists.remove("0")
@@ -456,7 +457,7 @@ def report_cards(request):
                     lists100 = lists100[0:length-1]
                     for row_num in range(len(lists100)): ##100% marks
                         col_num = 3
-                        worksheet.write(row_num+7, col_num, lists100[row_num]) 
+                        worksheet.write(row_num+7, col_num, lists100[row_num], merge_format1) 
                     dft = pd.DataFrame(report.objects.all().values().filter(school=sch).filter(level = i)) 
                     studs = list(dft['stu_id'])
                     dfr = pd.DataFrame(report.objects.all().values().filter(school=sch).filter(level = i).filter(stu_id = q))
@@ -476,11 +477,18 @@ def report_cards(request):
                         listn = listn[0:length-1]
                     for row_num in range(len(listn)): ##100% marks
                         col_num = 4
-                        worksheet.write(row_num+7, col_num, listn[row_num])           
-                
-                
-
-                
+                        worksheet.write(row_num+7, col_num, listn[row_num], merge_format1)           
+                    worksheet.write(12, 0, 'Overall Class Position', merge_format)
+                    dff100 = pd.DataFrame(report.objects.all().values().filter(school=sch).filter(level = i)) 
+                    dff100['total'] = dff100[cols].sum(axis=1)
+                    dff100['rank'] = list(rankdata(list(dff100['total'])))
+                    dff100['rank'] = (len(list(dff100['total']))+1) - rankdata(list(dff100['total']))
+                    dff100 = dff100[dff100['stu_id'] == q]
+                    pos_id = list(dff100['rank'])[0] 
+                    worksheet.write(13, 0, pos_id, merge_format1)
+                    worksheet.write(15, 1, 'Remarks by Class Teacher/ Form Master:', merge_format)
+                    worksheet.write(21, 1, 'Class Teacher/ Form Master', merge_format)
+                    worksheet.write(21, 3, 'Head Teacher', merge_format)
                 # df100 = df100.sort_values([p], ascending=[True])
         #       for z in cols:
                     
