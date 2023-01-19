@@ -21,7 +21,9 @@
         </div>
     </nav>
     <br>
-    <h4>Welcome {{ full_sch }}, Term: {{ term }}</h4>
+    <h4>Welcome {{ full_sch }}.</h4>
+    <br>
+    <h3>Term: {{ term }}</h3>
     <div style="margin-top: 10px">
         <form action="{% url "uploading:index" %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
