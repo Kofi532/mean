@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import use, sch_reg, act, class_fee, classn
 import pandas as pd
-from .forms import PostForm, RegForm, ActTerm, FeeForm, ClassnForm
+from .forms import PostForm, RegForm, ActTerm, FeeForm, ClassnForm, UserForm
 from datetime import date
 from uploading.models import fees_update
 from django.http import HttpResponse
@@ -494,7 +494,7 @@ def download3(request):
         'border': 0,
         'align': 'center',
         'valign': 'vcenter',
-        'bg_color': 'yellow',
+        #'bg_color': 'yellow',
         'locked': False
         })
 
@@ -684,3 +684,7 @@ def fees(request):
                     class_fee.objects.filter(school =sch).filter(classes= classes).delete()
                     new_entry.save()
             return render(request, 'fee.html', {'f_form': f_form, 'cfees':cfees, 'schf': schf, 'z': z})
+
+
+
+            
