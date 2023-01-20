@@ -24,6 +24,9 @@ def download_sub(request):
     username = None
     usernamed = request.user.username
     df_act = pd.DataFrame(act.objects.all().values().filter(username=usernamed))
+    if list(df_act) == []:
+        return render(request, 'pleaseterm.html', {})
+    df_act = pd.DataFrame(act.objects.all().values().filter(username=usernamed))
     term = list(df_act['active_term']) 
     term = term[0]
     dfr = pd.DataFrame(sch_reg.objects.all().values().filter(username=usernamed))
@@ -39,6 +42,8 @@ def download_sub(request):
     ff = list(df['school'])
     sch = ff[0]
     skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
+    if list(skuul) == []:
+        return render(request, 'registerclass.html', {})   
     com = ['classA', 'classB', 'classC', 'classD', 'classE', 'classF', 'classG', 'classH','classI','classJ', 'classK', 'classL', 'classM', 'classN', 'classO']
     skuul = skuul[com]
     ree = list(skuul.iloc[0])
@@ -276,7 +281,7 @@ def upload_report(request):
 
 
 
-def report_reg(request):
+def report_reg(request): ##add subjects
 
     form = ReportForm(request.POST or None)
     username = None

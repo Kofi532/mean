@@ -23,6 +23,7 @@ class fees_update(models.Model):
     father_name = models.CharField(max_length=30, default='None',null=True)
     father_contact = models.CharField(max_length=30, default='None',null=True)
     promote = models.CharField(max_length=30, default=1,null=True)
+    datebirth = models.CharField(max_length=30, default=0)
     def __str__(self):
         return self.stu_id
 

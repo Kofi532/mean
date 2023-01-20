@@ -28,6 +28,7 @@ urlpatterns = [
     path("display/", uvs.display, name='display'),
     path("download/", uvs.download3, name='download'),
     path("fees/", uvs.fees, name='fees'),
+    path("deleteclass/", uvs.deleteclass, name='deleteclass'),
     path("addsub/", rvs.report_reg, name='subj'),
     path("downloadsub/", rvs.download_sub, name='download_subj'),
     path("uploadsub/", rvs.upload_report, name='upload_subj'),

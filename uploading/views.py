@@ -26,6 +26,7 @@ from django.contrib.auth.decorators import login_required
 def login(request):
     return render(request,'logout.html', {})
 
+
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
@@ -49,6 +50,8 @@ def delete_std(request):
         active = use.objects.all().values().filter(school = sch) 
         cfees = class_fee.objects.all().values().filter(school = sch) 
         skuul =  pd.DataFrame(fees_update.objects.all().values().filter(school = sch))
+        if list(skuul) == []:
+            return render(request, 'nostudents.html', {})
         z= list(skuul['stu_id'])
         if request.method == 'POST':
             student = request.POST.get('student')
@@ -146,6 +149,11 @@ def index(request):
                 else:
                     claz_df = list(claz_df['fee'])
                     clazfee = claz_df[0]
+                day = list(df['DateOfBirth-Day'])
+                month = list(df['DateOfBirth-Month'])
+                year = list(df['DateOfBirth-Year'])
+                df['dob'] = [str(x)+'/' +str(y)+'/'+str(z) for x, y, z in zip(day, month, year)]
+                see = list(df['dob'])
                 df['middlename'] = df['middlename'].fillna('None')
                 df['mother_name'] = df['mother_name'].fillna('None')
                 df['father_name'] = df['father_name'].fillna('None')
@@ -195,9 +203,11 @@ def index(request):
                 df['level'] = i
                 df['school_full'] = fullsch
     #['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount','amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3','fee', 'balance', 'school', 'datey', 'school_full', 'mother_name', 'mother_contact', 'father_name', 'father_contact']
-                com = ['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount', 'fee', 'balance', 'school','school_name', 'datey', 'school_full', 'mother_name', 'mother_contact', 'father_name', 'father_contact']
+                com = ['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount', 'fee', 'balance', 'school','school_name', 'datey', 'school_full', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'dob']
                 df = df[com]
                 df = df.dropna()
+                if 'None' in str(list(df['firstname'])):
+                    return render(request, 'nostudents.html', {})
                 for index, row in df.iterrows():
                     model = fees_update()
                     model.stu_id = row['stu_id']
@@ -215,6 +225,7 @@ def index(request):
                     model.father_name = row['father_name']
                     model.mother_contact = row['mother_contact']
                     model.father_contact = row['father_contact']
+                    model.datebirth = row['dob']
                     model.save()
     #        return render(request, 'upload.html', {})
         

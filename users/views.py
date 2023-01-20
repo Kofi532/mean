@@ -16,7 +16,7 @@ import string
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
-def addclass(request):
+def deleteclass(request):
     
     form = ClassnForm(request.POST or None)
     username = None
@@ -27,7 +27,7 @@ def addclass(request):
     ff = list(dfs['school'])
     sch = ff[0]
     df = pd.DataFrame(classn.objects.all().values().filter(school = sch))
-
+    classn.objects.filter(school=sch).delete()
     if list(df) == []:
         if request.method == 'POST'and form.is_valid():
             classA = request.POST.get('classA')
@@ -65,7 +65,59 @@ def addclass(request):
             return render(request, 'thanks.html', {})
         return render(request, 'classn.html', {'form': form })        
     else:
-        return render(request, 'thanks.html', {})
+        return render(request, 'resetclass.html', {})
+
+
+
+def addclass(request):
+    
+    form = ClassnForm(request.POST or None)
+    username = None
+    usernamed = request.user.username 
+    dfs = pd.DataFrame(use.objects.all().values().filter(username = usernamed))
+    if list(dfs) == []:
+        dfs = pd.DataFrame(sch_reg.objects.all().values().filter(username = usernamed))
+    ff = list(dfs['school'])
+    sch = ff[0]
+    df = pd.DataFrame(classn.objects.all().values().filter(school = sch))
+    if list(df) == []:
+        if request.method == 'POST'and form.is_valid():
+            classA = request.POST.get('classA')
+            classA = classA.replace(" ", "")            
+            classB = request.POST.get('classB')
+            classB = classB.replace(" ", "")  
+            classC = request.POST.get('classC')
+            classC = classC.replace(" ", "") 
+            classD = request.POST.get('classD')
+            classD = classD.replace(" ", "") 
+            classE = request.POST.get('classE')
+            classE = classE.replace(" ", "") 
+            classF = request.POST.get('classF')
+            classF = classF.replace(" ", "") 
+            classG = request.POST.get('classG')
+            classG = classG.replace(" ", "")
+            classH = request.POST.get('classH')
+            classH = classH.replace(" ", "")
+            classI = request.POST.get('classI')
+            classI = classI.replace(" ", "")
+            classJ = request.POST.get('classJ')
+            classJ = classJ.replace(" ", "")
+            classK = request.POST.get('classK')
+            classK = classK.replace(" ", "")
+            classL = request.POST.get('classL')
+            classL = classL.replace(" ", "")
+            classM = request.POST.get('classM')
+            classM = classM.replace(" ", "")
+            classN = request.POST.get('classN')
+            classN = classN.replace(" ", "")
+            classO = request.POST.get('classO')
+            classO = classO.replace(" ", "")
+            mod =classn(school = sch,  classA=classA, classB=classB, classC=classC, classD=classD, classE=classE, classF=classF, classG=classG, classH=classH, classI=classI, classJ=classJ, classK=classK, classL=classL, classM=classM, classN=classN, classO=classO)
+            mod.save()
+            return render(request, 'thanks.html', {})
+        return render(request, 'classn.html', {'form': form })        
+    else:
+        return render(request, 'resetclass.html', {})
 
 def registerschool(request):
     username = None
@@ -472,7 +524,7 @@ def download3(request):
     skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
     if list(skuul) == []:
         return render(request, 'registerclass.html', {})
-    else:
+    else: 
         com = ['classA', 'classB', 'classC', 'classD', 'classE', 'classF', 'classG', 'classH','classI','classJ', 'classK', 'classL', 'classM', 'classN', 'classO']
         skuul = skuul[com]
         ree = list(skuul.iloc[0])
@@ -503,7 +555,6 @@ def download3(request):
         'border': 0,
         'align': 'center',
         'valign': 'vcenter'})
-
         f1= workbook.add_format()
     #  ree = ['Creche','K.G1', 'K.G2','Class1', 'Class2', 'Class3', 'Class4', 'Class5', 'Class6', 'J.H.S1', 'J.H.S2', 'J.H.S3']
     #  ree = ['Class 1']
@@ -515,22 +566,26 @@ def download3(request):
             ws1.protect()
             row_num = 0     
     #['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount','amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3','fee', 'balance', 'school', 'datey', 'school_full', 'mother_name', 'mother_contact', 'father_name', 'father_contact']
-            columns = ['number', 'stu_id', 'firstname' , 'middlename', 'lastname','level', 'cummulated fee for term', 'balance for term','amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'amount' ]
+            columns = ['###','amount', 'stu_id', 'firstname', 'middlename', 'lastname', 'level','fee per term', 'total balance', 'amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'DateOfBirth']
+            #columns = ['number', 'stu_id', 'firstname' , 'middlename', 'lastname','level', 'cummulated fee for term', 'balance for term','amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'amount' ]
+            #columns = ['number', 'stu_id', 'firstname' , 'middlename', 'lastname','level', 'cummulated fee for term', 'balance for term','amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'amount']
             for col_num in range(len(columns)):
                 f1.set_bold(True)
                 worksheet.write(row_num, col_num, columns[col_num], f1) 
                 worksheet.set_column(row_num, col_num, 20)
-
-            rows = fees_update.objects.all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'level', 'fee','balance', 'amountpaid_term1', 'amountpaid_term2','amountpaid_term3' )
-            c1 = pd.DataFrame(fees_update.objects.values().all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'fee', 'level', 'balance',  'amountpaid_term1', 'amountpaid_term2','amountpaid_term3'))
+            
+            rows = fees_update.objects.all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'level', 'fee', 'balance','amountpaid_term1', 'amountpaid_term2','amountpaid_term3','mother_name', 'mother_contact', 'father_name', 'father_contact', 'datebirth' )            
+            #rows = fees_update.objects.all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'level', 'fee','balance', 'amountpaid_term1', 'amountpaid_term2','amountpaid_term3' )
+            c1 = pd.DataFrame(fees_update.objects.values().all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'fee', 'level', 'balance',  'amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'datebirth'))
             shape = c1.shape
             shape = shape[1]
             for row in rows:
+                pik = row[0]
                 row_num += 1
-                for col_num in range(shape):##check this one
-                    worksheet.write(row_num, col_num+1, row[col_num])
-                    worksheet.write(row_num, shape +1, 0,merge_format2)
-                    place = 'L'+str(row_num+1)
+                for col_num in range(shape+1):##check this one
+                    worksheet.write(row_num, col_num+1, row[col_num-1])
+                    worksheet.write(row_num, 1, 0,merge_format2)
+                    place = 'B'+str(row_num+1)
                     worksheet.data_validation(place, {'validate': 'decimal',
                                     'criteria': '<',
                                     'value': 100000000000,
@@ -539,7 +594,7 @@ def download3(request):
 
 
     #['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount','amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3','fee', 'balance', 'school', 'datey', 'school_full', 'mother_name', 'mother_contact', 'father_name', 'father_contact']
-            columns = ['number', 'firstname' , 'middlename', 'lastname', 'fee', 'mother_name', 'mother_contact', 'father_name', 'father_contact' ]
+            columns = ['number', 'firstname' , 'middlename', 'lastname', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'DateOfBirth-Day', 'DateOfBirth-Month', 'DateOfBirth-Year' ]
             row_num = 0
             for col_num in range(len(columns)):
                 ws1.write(row_num, col_num, columns[col_num], f1)  # at 0 row 0 column 
@@ -657,6 +712,9 @@ def fees(request):
             schf = ffs[0]
             ff = list(df['school'])
             sch = ff[0]
+            skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
+            if list(skuul) == []:
+                return render(request, 'registerclass.html', {})
             ffc = list(df['contact_details'])
             schc = ffc[0] 
             active = use.objects.all().values().filter(school = sch) 
