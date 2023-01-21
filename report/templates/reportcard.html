@@ -18,7 +18,7 @@
 <div style="margin-left: 10px;">
 
 <form method="post" enctype="multipart/form-data">
-
+<p>Kindly choose class to download.</p>
 
     {% csrf_token %}
     <form action='/fees/' method="POST" enctype="multipart/form-data">
@@ -28,6 +28,8 @@
             <option value="{{ i }}">{{ i }}</option>
             {% endfor %}
         </select>
-    <button class="btn btn-primary w-100 py-3" type="submit">Download</button>
+        <br>
+        <br>
+    <button  type="submit">Download</button>
 </form>
 </div>

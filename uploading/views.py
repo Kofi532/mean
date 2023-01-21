@@ -371,6 +371,8 @@ def fetch(request):
         sch = ff[0]
         df = pd.DataFrame(fees_update.objects.all().values().filter(school = sch))
         skuul =  pd.DataFrame(classn.objects.all().values().filter(school = sch))
+        if list(skuul) == []:
+            return render(request, 'registerclass.html', {})
         com = ['classA', 'classB', 'classC', 'classD', 'classE', 'classF', 'classG', 'classH','classI','classJ', 'classK', 'classL', 'classM', 'classN', 'classO']
         skuul = skuul[com]
         ree = list(skuul.iloc[0])
@@ -381,6 +383,8 @@ def fetch(request):
         #ree = ['Creche', 'K.G1']
         for z in ree:
             dft = pd.DataFrame(fees_update.objects.all().values().filter(school = sch).filter(level = z).filter(promote = 1))
+            if list(dft) == []:
+                return render(request, 'nostudents.html', {})
             if list(dft) == []:
                 move = 1
             else:
