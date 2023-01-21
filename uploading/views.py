@@ -22,6 +22,17 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate
+
+def loggin(request):
+    user = authenticate(username='john', password='secret')
+    if user is not None:
+        return render(request, 'thanks.html', {})
+        # A backend authenticated the credentials
+    else:
+        return render(request, 'loggin.html', {'user':user})
+        # No backend authenticated the credentials
+
 
 def login(request):
     return render(request,'logout.html', {})

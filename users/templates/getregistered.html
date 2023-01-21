@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
@@ -23,7 +23,7 @@
 
 <form action="/registerschool/" method="post">
     {% csrf_token %}
-    {{ form|crispy }}
+    {{ form.as_p }}
     <input type="submit" value="Submit">
 </form>
 <br>

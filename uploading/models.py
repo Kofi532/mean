@@ -27,4 +27,9 @@ class fees_update(models.Model):
     def __str__(self):
         return self.stu_id
 
+class loginmodel(models.Model):  
+    username = models.CharField(max_length=30, default=0)
+    password = models.CharField(max_length=30, default=0)
+    def __str__(self):
+        return self.username
 #['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount','amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3','fee', 'balance', 'school', 'datey', 'school_full', 'mother_name', 'mother_contact', 'father_name', 'father_contact']

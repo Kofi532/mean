@@ -123,6 +123,7 @@ def registerschool(request):
     username = None
     usernamed = request.user.username
     df_act = pd.DataFrame(act.objects.all().values().filter(username=usernamed))
+
     form = RegForm(request.POST)
     df = pd.DataFrame(sch_reg.objects.all().values())
     if list(df) == []:
@@ -137,6 +138,7 @@ def registerschool(request):
         sch_reg.objects.filter(username = usernamed).delete()
         full_sch = form.cleaned_data['full_sch']
         contact_details = form.cleaned_data['contact_details']
+        #sch_reg.objects.filter(school=1).update(value=F('value') + 1)
         new_entry= sch_reg(username = usernamed, full_sch = full_sch, school = max_value, contact_details = contact_details)
         new_entry.save()
         return render(request, 'thanks.html', {})
@@ -148,13 +150,16 @@ def updateschool(request):
     df_act = pd.DataFrame(act.objects.all().values().filter(username=usernamed))
     form = RegForm(request.POST)
     df = pd.DataFrame(sch_reg.objects.all().values())
+    uusers = list(df['username'])
+    if usernamed not in uusers:
+        return render(request, 'unauth.html', {})
     delis = list(df['school'])
     delis = [float(i) for i in delis]
     max_value = int(max(delis))+1
     max_value = str(max_value)
     det = sch_reg.objects.all().values().filter(username = usernamed)
     if request.method == 'POST' and form.is_valid():
-        sch_reg.objects.filter(username = usernamed).delete()
+        #sch_reg.objects.filter(username = usernamed).delete()
         full_sch = form.cleaned_data['full_sch']
         contact_details = form.cleaned_data['contact_details']
         sch_reg.objects.filter(username=usernamed).update(full_sch=full_sch, contact_details = contact_details)        
@@ -566,7 +571,7 @@ def download3(request):
             ws1.protect()
             row_num = 0     
     #['stu_id', 'firstname', 'middlename', 'lastname', 'level', 'amount','amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3','fee', 'balance', 'school', 'datey', 'school_full', 'mother_name', 'mother_contact', 'father_name', 'father_contact']
-            columns = ['###','amount', 'stu_id', 'firstname', 'middlename', 'lastname', 'level','fee per term', 'total balance', 'amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'DateOfBirth']
+            columns = ['###','stu_id','amount',  'firstname', 'middlename', 'lastname', 'level','fee per term', 'total balance', 'amountpaid_term1', 'amountpaid_term2', 'amountpaid_term3', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'DateOfBirth']
             #columns = ['number', 'stu_id', 'firstname' , 'middlename', 'lastname','level', 'cummulated fee for term', 'balance for term','amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'amount' ]
             #columns = ['number', 'stu_id', 'firstname' , 'middlename', 'lastname','level', 'cummulated fee for term', 'balance for term','amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'amount']
             for col_num in range(len(columns)):
@@ -574,18 +579,19 @@ def download3(request):
                 worksheet.write(row_num, col_num, columns[col_num], f1) 
                 worksheet.set_column(row_num, col_num, 20)
             
-            rows = fees_update.objects.all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'level', 'fee', 'balance','amountpaid_term1', 'amountpaid_term2','amountpaid_term3','mother_name', 'mother_contact', 'father_name', 'father_contact', 'datebirth' )            
+            rows = fees_update.objects.all().filter(school = sch).filter(level = t).values_list('stu_id','promote', 'firstname' , 'middlename', 'lastname', 'level', 'fee', 'balance','amountpaid_term1', 'amountpaid_term2','amountpaid_term3','mother_name', 'mother_contact', 'father_name', 'father_contact', 'datebirth' )            
             #rows = fees_update.objects.all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'level', 'fee','balance', 'amountpaid_term1', 'amountpaid_term2','amountpaid_term3' )
-            c1 = pd.DataFrame(fees_update.objects.values().all().filter(school = sch).filter(level = t).values_list('stu_id', 'firstname' , 'middlename', 'lastname', 'fee', 'level', 'balance',  'amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'datebirth'))
+            c1 = pd.DataFrame(fees_update.objects.values().all().filter(school = sch).filter(level = t).values_list('stu_id','promote','firstname' , 'middlename', 'lastname', 'fee', 'level', 'balance',  'amountpaid_term1', 'amountpaid_term2','amountpaid_term3', 'mother_name', 'mother_contact', 'father_name', 'father_contact', 'datebirth'))
             shape = c1.shape
             shape = shape[1]
             for row in rows:
                 pik = row[0]
                 row_num += 1
                 for col_num in range(shape+1):##check this one
-                    worksheet.write(row_num, col_num+1, row[col_num-1])
-                    worksheet.write(row_num, 1, 0,merge_format2)
-                    place = 'B'+str(row_num+1)
+                    worksheet.write(row_num, col_num, row[col_num-1])
+                    worksheet.write(row_num, 2, 0,merge_format2)
+                    worksheet.write(row_num, 0, '#',merge_format2)
+                    place = 'C'+str(row_num+1)
                     worksheet.data_validation(place, {'validate': 'decimal',
                                     'criteria': '<',
                                     'value': 100000000000,
@@ -615,14 +621,13 @@ def download3(request):
     #            wsr.write_formula('C2','=VLOOKUP(B2,Creche!B2:I100,3,FALSE)') 
             wsr.merge_range('A1:E1', schr, merge_format)
             wsr.merge_range('A2:E2', 'Tel: '+tel , merge_format)
-            wsr.write_formula('B5','=VLOOKUP(A5,'+t+'!B2:L100, 2,FALSE)', merge_format1)
-            wsr.write_formula('C5','=VLOOKUP(A5,'+t+'!B2:L100, 3,FALSE)', merge_format1) 
-            wsr.write_formula('D5','=VLOOKUP(A5,'+t+'!B2:L100, 4,FALSE)', merge_format1)
-            wsr.write_formula('E5','=VLOOKUP(A5,'+t+'!B2:L100, 5,FALSE)', merge_format1)
-            wsr.write_formula('E5','=VLOOKUP(A5,'+t+'!B2:L100, 5,FALSE)', merge_format1)
-            wsr.write_formula('A8','=VLOOKUP(A5,'+t+'!B2:L100, 6,FALSE)', merge_format1)
-            wsr.write_formula('C8','=VLOOKUP(A5,'+t+'!B2:L100, 7,FALSE)', merge_format1)
-            wsr.write_formula('B8','=VLOOKUP(A5,'+t+'!B2:L100, 11,FALSE)', merge_format1)
+            wsr.write_formula('B5','=VLOOKUP(A5,'+t+'!B2:Q10000, 3,FALSE)', merge_format1)
+            wsr.write_formula('C5','=VLOOKUP(A5,'+t+'!B2:Q10000, 4,FALSE)', merge_format1) 
+            wsr.write_formula('D5','=VLOOKUP(A5,'+t+'!B2:Q10000, 5,FALSE)', merge_format1)
+            wsr.write_formula('E5','=VLOOKUP(A5,'+t+'!B2:Q10000, 6,FALSE)', merge_format1)
+            wsr.write_formula('A8','=VLOOKUP(A5,'+t+'!B2:Q10000, 7,FALSE)', merge_format1)
+            wsr.write_formula('C8','=VLOOKUP(A5,'+t+'!B2:Q10000, 8,FALSE)', merge_format1)
+            wsr.write_formula('B8','=VLOOKUP(A5,'+t+'!B2:Q10000, 2,FALSE)', merge_format1)
             wsr.write_formula('D8','=C8 - B8', merge_format1)
             wsr.write(7, 4, str(date.today()), merge_format1)
 
