@@ -22,8 +22,10 @@
     </nav>
 
 <form action="/registerschool/" method="post">
+  <br>
+  <p>Please provide FULL NAME OF SCHOOL and CONTACT DETAILS OF SCHOOL</p>
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form | crispy }}
     <input type="submit" value="Submit">
 </form>
 <br>
